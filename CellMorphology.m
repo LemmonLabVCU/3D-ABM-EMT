@@ -199,15 +199,21 @@ end
 % Update CellState Structure based on initialized morphology
 CellState.Position = [CellState.Position, CellState.Position]; 
 
-CellState.Ncad(:, 1:2) = [CellState.conc(:, 8), CellState.conc(:, 8)];
+CellState.Ncad = [CellState.conc(:, 8), CellState.conc(:, 8)];
 CellState.Ecad         = CellState.conc(:, 7);
+
 CellState.Snail        = CellState.conc(:, 2);
 CellState.Zeb1         = CellState.conc(:, 5); 
-            
+
+CellState.R200        = CellState.conc(:, 6);
+CellState.R34         = CellState.conc(:, 3);   
+
 CellState.AvgEcad(1)       = mean(CellState.conc(:, 7)); 
 CellState.AvgNcad(1)       = mean(CellState.conc(:, 8));
+
 CellState.AvgSnail(1)      = mean(CellState.conc(:, 2)); 
 CellState.AvgZeb1(1)       = mean(CellState.conc(:, 5));
+
 CellState.AvgR200(1)       = mean(CellState.conc(:, 6)); 
 CellState.AvgR34(1)        = mean(CellState.conc(:, 3));
 
