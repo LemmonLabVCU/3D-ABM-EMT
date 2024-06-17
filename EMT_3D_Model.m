@@ -11,7 +11,7 @@
 % and temporal changes in each cell defined in the system.
 
 % Created by Kristin Kim: kimkp@vcu.edu
-% Last Modified by: Kristin Kim, May 24, 2023
+% Last Modified by: Kristin Kim
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -42,7 +42,7 @@ z           = linspace(0, L, n); % converts pixels to um
 
 % Do you want to save a .gif image of the run? 
 getVideo = 0;   % Record Video = 1   ; No Video = 0
-videoName = 'TGFB0_0Dtgfb_360hr_Embedded_July19.gif'; % define name of output video
+videoName = 'Insert_Name_Here.gif'; % define name of output video
 
 % Setting up the Time Scale
 Tfinal      = 15*24;            % total time of the run (hr)
@@ -50,21 +50,23 @@ dt          = 1;                % time step (hr)
 tskip       = 24;               % define the time intervals shown in the .gif
 
 % Setting up Exogeneous TGFB1 variable
-TGFB        = 2;                % exogeneous TGFB0 (uM)
-Ctgfb       = TGFB*ones(n,n,n); % TGFB concentration gradient
-TGFBMax     = TGFB + 2;
+TGFB        = 0;                % exogeneous TGFB0 (uM)
+Ctgfb       = TGFB*ones(n,n,n); % TGFB concentration matrix
+TGFBMax     = TGFB + 2;         % Max Concentration shown on colorbar when plotting
+TGFBstimuli = 0;                % TGFB Signaling Dynamics: 0: Constant; 1: Removed; 2: Pulsed; 3: Added
+TimeInt     = 0*24;             % Time interval of pulsed/ removal of TGFB1
 
 % Setting up Diffusion Coefficients/ ECM representation
-Dcyt    = 38;     % TGFB diffusion coefficient (1/hr)
+Dcyt    = 38;                % TGFB diffusion coefficient (1/hr)
 Dtgfb   = Dcyt*ones(n,n,n);  % Diffusion values matrix (nxnxn)
 
 CellState   = struct();
-CellState             = DefineCells(CellState); 
+CellState   = DefineCells(CellState); 
     % Set up structure (CellState) that holds cell-specific variable
  
-MorphType = '0';  % 0 - spheroid, 1 - vertical straight tube, 2 = horizontal straight tube, 3 - curved tube
+MorphType = '0';  % Cell Organization: 0 - spheroid, 1 - vertical straight tube, 2 = horizontal straight tube, 3 - curved tube
 CultureModel = 'Epithelial Only';
-FibroblastCount = 0;
+FibroblastCount = 0; % for co-culture models
 
 [CellState, Ctgfb, Dtgfb, Cstate] = CellMorphology(CellState, Param, Ctgfb, Dtgfb, MorphType, CultureModel, FibroblastCount);
 
@@ -83,6 +85,60 @@ end
 
 %% Setting up the time loop
 for t = 2:dt:Tfinal
+
+    switch TGFBstimuli
+        case 1 % Removed
+           if t > TimeInt
+               for i = 1:n
+                    for j = 1:n
+                        for k = 1:n
+                            if Cstate(i,j,k) == 0
+                                Ctgfb(i,j,k) = 0;
+                            end
+                        end
+                    end
+                end
+            end
+
+        case 2 % Pulsed
+           if rem(t, TimeInt*2) == 0
+               for i = 1:n
+                    for j = 1:n
+                        for k = 1:n
+                            if Cstate(i,j,k) == 0
+                                Ctgfb(i,j,k) = Ctgfb(i,j,k) + TGFB;
+                            end
+                        end
+                    end
+               end
+           elseif rem(t,TimeInt) == 0 && rem(t,TimeInt*2)~= 0
+               for i = 1:n
+                    for j = 1:n
+                        for k = 1:n
+                            if Cstate(i,j,k) == 0
+                                Ctgfb(i,j,k) = 0;
+                            end
+                        end
+                    end
+               end
+           end
+
+        case 3 % Increased Addition
+           if rem(t, TimeInt) == 0
+               for i = 1:n
+                    for j = 1:n
+                        for k = 1:n
+                            if Cstate(i,j,k) == 0
+                                Ctgfb(i,j,k) = Ctgfb(i,j,k) + TGFB;
+                            end
+                        end
+                    end
+               end
+           end
+
+        case 0 % Constant/ Single Bolus
+
+    end
    
     Cmoved = zeros(n,n,n); % monitor movements of cells + update in system
    
@@ -127,9 +183,13 @@ for t = 2:dt:Tfinal
     eInd = find(CellState.state < 4); % Only use cells that made up the initial spheroid
     CellState.AvgEcad(t)  = mean(CellState.conc(eInd, 7));
     CellState.AvgNcad(t)  = mean(CellState.Ncad(eInd, 2));
+
     CellState.AvgSnail(t) = mean(CellState.conc(eInd, 2));
     CellState.AvgZeb(t)   = mean(CellState.conc(eInd, 5));
-    
+
+    CellState.AvgR200(t)       = mean(CellState.conc(eInd, 6)); 
+    CellState.AvgR34(t)        = mean(CellState.conc(eInd, 3));
+        
     fInd = find(CellState.state == 4);
     Cstate2 = Cstate;
     for nn = 1:length(fInd)
@@ -162,7 +222,7 @@ if getVideo == 1
     end
 end
 
-%% Setting up other image outputs
+%% Setting up other figure outputs
 figure(2); 
 set(gcf, 'Position', [1100,110,469,823]); % [636,462,546,484]); % [903,42,386,954]); %set(gcf, 'Position', [833,42,485,954]);
 Tplots = tiledlayout(3, 1);
@@ -248,62 +308,5 @@ for i = 1:length(TimeInt)
     cc = TimeInt(i);
     Outputs(:, i) = [CellState.Pop(cc,1:3)'; Cell_total(cc); CellRatio(cc,1:3)'; ...
         CellState.AvgEcad(cc); CellState.AvgSnail(cc); CellState.AvgNcad(cc); ...
-        CellState.AvgZeb(cc); CellState.AvgR200(cc); CellState.AvgR34(cc); CellState.AvgTGFB(cc); ...
-        CellState.AvgDtgfb(cc); CellState.Carea(cc)];
+        CellState.AvgZeb(cc); CellState.AvgR200(cc); CellState.AvgR34(cc); CellState.Carea(cc)];
 end
-
-
-%%
-% switch TGFBstimuli
-%         case 'Removed'
-%            if t > TimeInt
-%                for i = 1:n
-%                     for j = 1:n
-%                         for k = 1:n
-%                             if Cstate(i,j,k) == 0
-%                                 Ctgfb(i,j,k) = 0;
-%                             end
-%                         end
-%                     end
-%                 end
-%             end
-% 
-%         case 'Pulsed'
-%            if rem(t, TimeInt*2) == 0
-%                for i = 1:n
-%                     for j = 1:n
-%                         for k = 1:n
-%                             if Cstate(i,j,k) == 0
-%                                 Ctgfb(i,j,k) = Ctgfb(i,j,k) + TGFB;
-%                             end
-%                         end
-%                     end
-%                end
-%            elseif rem(t,TimeInt) == 0 && rem(t,TimeInt*2)~= 0
-%                for i = 1:n
-%                     for j = 1:n
-%                         for k = 1:n
-%                             if Cstate(i,j,k) == 0
-%                                 Ctgfb(i,j,k) = 0;
-%                             end
-%                         end
-%                     end
-%                end
-%            end
-%         case 'Increasing Interval'
-%            if rem(t, TimeInt) == 0
-%                for i = 1:n
-%                     for j = 1:n
-%                         for k = 1:n
-%                             if Cstate(i,j,k) == 0
-%                                 Ctgfb(i,j,k) = Ctgfb(i,j,k) + TGFB;
-%                             end
-%                         end
-%                     end
-%                end
-%            end
-% 
-%         case 'Constant'
-% 
-%     end
-    
