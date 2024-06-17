@@ -64,7 +64,7 @@ CellState   = struct();
 CellState   = DefineCells(CellState); 
     % Set up structure (CellState) that holds cell-specific variable
  
-MorphType = '0';  % Cell Organization: 0 - spheroid, 1 - vertical straight tube, 2 = horizontal straight tube, 3 - curved tube
+MorphType = 0;  % Cell Organization: 0 - spheroid, 1 - vertical straight tube, 2 = horizontal straight tube, 3 - curved tube
 CultureModel = 'Epithelial Only';
 FibroblastCount = 0; % for co-culture models
 
