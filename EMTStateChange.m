@@ -27,20 +27,22 @@ for v = 1:numCells % for the number of cells in the system
 
       % Changing Cell State
             % E: < 1.5;    P: 1.5 < X < 2.4;  M: 2.4 < X < 3.1515
-            if CellState.Ncad(v,2) >= 2.4 && CellState.state(v) < 4 % Mesenchymal State
+            Cstate_prev = CellState.state(v);
+                        
+            if CellState.Ncad(v,2) >= 2.4  || CellState.state(v) >= 3 % Mesenchymal State
                 CellState.state(v) = 3;
                 Cstate(i,j,k) = 3;
 
-                if CellState.Ncad(v,1) < 2.4 && CellState.Ncad(v,2) >= 2.4 && CellState.state(v) < 3 % Partial to Mesenchymal
+                if CellState.Ncad(v,1) < 2.4 && CellState.Ncad(v,2) >= 2.4 && Cstate_prev == 2 % Partial to Mesenchymal
                     CellState.Pop(t, 2) =  CellState.Pop(t ,2) - 1;
                     CellState.Pop(t, 3) =  CellState.Pop(t, 3) + 1;
                 end
 
-            elseif CellState.Ncad(v,2) >= 1.5 && CellState.Ncad(v,2) < 2.4 && CellState.state(v) < 3 % Partial State
+            elseif CellState.Ncad(v,2) >= 1.5 && CellState.Ncad(v,2) < 2.4 % Partial State
                 CellState.state(v) = 2;
                 Cstate(i,j,k) = 2;
 
-                if CellState.Ncad(v,1) < 1.5 % E to P
+                if CellState.Ncad(v,1) < 1.5 && Cstate_prev == 1 % E to P
                     CellState.Pop(t, 1) = CellState.Pop(t, 1) - 1;
                     CellState.Pop(t, 2) = CellState.Pop(t, 2) + 1;
                 end
@@ -49,7 +51,7 @@ for v = 1:numCells % for the number of cells in the system
                 CellState.state(v) = 1;
                 Cstate(i,j,k) = 1;
                 
-                if CellState.Ncad(v,1) >= 1.5 && CellState.Ncad(v,1) < 2.4 % P to E
+                if CellState.Ncad(v,1) >= 1.5 && CellState.Ncad(v,1) < 2.4 && Cstate_prev == 2 % P to E
                     CellState.Pop(t, 1) = CellState.Pop(t, 1) + 1;
                     CellState.Pop(t, 2) = CellState.Pop(t, 2) - 1; 
                 end         
