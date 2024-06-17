@@ -1,6 +1,5 @@
 function [CellState, Cstate, Ctgfb, Dtgfb] = EMTStateChange(CellState, Param, Cstate, Ctgfb, Dtgfb, t, Tfinal, dt)
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
+% EMTStateChange: Function that runs EMT characterization based on changes in concentration of N-Cadherin.
 
 numCells = length(CellState.state);
 CellState.Pop(t, :) = CellState.Pop(t - 1, :);
@@ -19,6 +18,10 @@ for v = 1:numCells % for the number of cells in the system
         CellState.Snail(v) = CellState.conc(v,2);
         
         CellState.p(v)       = CellState.Ncad(v,2) / Param.NcadMax;
+        if CellState.p(v) > 1
+            CellState.p(v) = 1;
+        end
+        
         Dtgfb(i,j,k)         = Param.Dcell*(1-CellState.p(v));
         CellState.Ctgfb(v)   = Ctgfb(i,j,k);
 
@@ -28,12 +31,12 @@ for v = 1:numCells % for the number of cells in the system
                 CellState.state(v) = 3;
                 Cstate(i,j,k) = 3;
 
-                if CellState.Ncad(v,1) < 2.4 && CellState.Ncad(v,2) >= 2.4 % Partial to Mesenchymal
+                if CellState.Ncad(v,1) < 2.4 && CellState.Ncad(v,2) >= 2.4 && CellState.state(v) < 3 % Partial to Mesenchymal
                     CellState.Pop(t, 2) =  CellState.Pop(t ,2) - 1;
                     CellState.Pop(t, 3) =  CellState.Pop(t, 3) + 1;
                 end
 
-            elseif CellState.Ncad(v,2) >= 1.5 && CellState.Ncad(v,2) < 2.4 && CellState.state(v) < 4% Partial State
+            elseif CellState.Ncad(v,2) >= 1.5 && CellState.Ncad(v,2) < 2.4 && CellState.state(v) < 3 % Partial State
                 CellState.state(v) = 2;
                 Cstate(i,j,k) = 2;
 
@@ -42,7 +45,7 @@ for v = 1:numCells % for the number of cells in the system
                     CellState.Pop(t, 2) = CellState.Pop(t, 2) + 1;
                 end
 
-            elseif CellState.Ncad(v,2) < 1.5 && CellState.state(v) < 4 % Epithelial State
+            elseif CellState.Ncad(v,2) < 1.5 && CellState.state(v) < 3 % Epithelial State
                 CellState.state(v) = 1;
                 Cstate(i,j,k) = 1;
                 
