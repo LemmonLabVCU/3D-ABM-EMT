@@ -224,11 +224,13 @@ numEmpty = size(emptyLoc,1); % number of free spots with no cells
               
            else
                 CellState.Position(v, 4:6) = [newi, newj, newk]; 
-                CellState.Ctgfb(v)         = Ctgfb(newi, newj, newk);
-
                 Cstate(newi, newj, newk) = Cstate(i,j,k); 
                 Cstate(i,j,k)            = 0;
+                
                 Dtgfb(newi, newj, newk)  = Dtgfb(i,j,k); % moving ECM along, not breaking previous
+                CellState.Ctgfb(v)       = Ctgfb(newi, newj, newk);
+                CellState.Dcell(v)       = Dtgfb(newi, newj, newk);
+                
                 Cmoved(newi, newj, newk) = 1;
            end
         end
@@ -270,17 +272,14 @@ numEmpty = size(emptyLoc,1); % number of free spots with no cells
             CellState.conc(end + 1, :)      = CellState.conc(v, :);
             
             CellState.Ncad(end + 1, :)      = [CellState.Ncad(v, 2), CellState.Ncad(v, 2)];
-            CellState.Ecad(end + 1, :)      = CellState.Ecad(v);
-            CellState.Snail(end + 1, :)     = CellState.Snail(v);
-            CellState.Zeb1(end + 1, :)      = CellState.Zeb1(v); 
             
             CellState.p(end + 1)            = CellState.p(v);
             CellState.Divide(end + 1)       = 0;
             CellState.TimesMoved(end + 1)   = 0; 
 
             Dtgfb(newi,newj,newk)           = Dtgfb(i,j,k); % reuse same ECM type
-            %CellState.Dcell(end + 1) = Dtgfb(newi, newj, newk);
-
+            
+            CellState.Dcell(end + 1)        = Dtgfb(newi, newj, newk);
             CellState.Ctgfb(end + 1)        = Ctgfb(newi, newj, newk);
     
             CellState.Pop(t, cellType) = CellState.Pop(t, cellType) + 1; 
