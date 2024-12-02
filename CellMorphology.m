@@ -1,8 +1,6 @@
-
-
 function [CellState, Ctgfb, Dtgfb, Cstate] = CellMorphology(CellState, Param, Ctgfb, Dtgfb, MorphType, CultureModel, FibroblastCount)
-%%
 % CellMorphology.m: Modifies the starting cell structure.
+
 n = Param.n;
 h = round(n/2); 
 cnt = 1;
@@ -26,11 +24,13 @@ switch MorphType
 
                        CellState.p(cnt)      = CellState.conc(cnt, 8) / Param.NcadMax; % probability threshold dependent on Ncad
                        Dtgfb(i,j,k)          = Param.Dcell*(1-CellState.p(cnt)); % defining diffusion coefficient for each cell
-                                             
-                       CellState.Ctgfb(cnt)         = Ctgfb(i,j,k); % TGFB concentration gradient
+                    
+                       CellState.Dcell(cnt)         = Dtgfb(i,j,k); % Tracks Diffusion coefficient for each cell                   
+                       CellState.Ctgfb(cnt)         = Ctgfb(i,j,k); % Tracks TGFB concentration for each cell
                        
                        CellState.Pop(1) =  CellState.Pop(1) + 1; % counts total cells in the system
-                       cnt       = cnt + 1;       % increase cell count               
+                       cnt       = cnt + 1;       % increase cell count     
+                       
                     end
                 end
             end
@@ -49,15 +49,18 @@ switch MorphType
                        CellState.Divide(cnt)     = 0;
                        CellState.conc(cnt, :)    = EConc; % initial ODE conditions
                                 % [snail, SNAIL, miRNA34, zeb1, Zeb1, miRNA200, ECAD, NCAD]
+                                
                        CellState.state(cnt)      = 1;
-
                        CellState.TimesMoved(cnt) = 0;
 
                        CellState.p(cnt)      = CellState.conc(cnt, 8) / Param.NcadMax; % probability threshold dependent on Ncad
                        Dtgfb(i,j,k)          = Param.Dcell*(1-CellState.p(cnt)); % defining diffusion coefficient for each cell
-
+                       CellState.Dcell(cnt)  = Dtgfb(i,j,k); 
+                       CellState.Ctgfb(cnt)  = TGFB; % TGFB concentration gradient
+                       
                        CellState.Pop(1) =  CellState.Pop(1) + 1; % counts total cells in the system
-                       cnt       = cnt + 1;       % increase cell count               
+                       cnt       = cnt + 1;       % increase cell count    
+                       
                     end
                 end
             end
@@ -81,9 +84,12 @@ switch MorphType
 
                        CellState.p(cnt)      = CellState.conc(cnt, 8) / Param.NcadMax; % probability threshold dependent on Ncad
                        Dtgfb(i,j,k)          = Param.Dcell*(1-CellState.p(cnt)); % defining diffusion coefficient for each cell
-
+                       CellState.Dcell(cnt)  = Dtgfb(i,j,k); 
+                       CellState.Ctgfb(cnt)  = TGFB; % TGFB concentration gradient
+                       
                        CellState.Pop(1) =  CellState.Pop(1) + 1; % counts total cells in the system
-                       cnt       = cnt + 1;       % increase cell count               
+                       cnt       = cnt + 1;       % increase cell count   
+                       
                     end
                 end
             end
@@ -150,7 +156,10 @@ switch MorphType
 
            CellState.p(cnt)      = CellState.conc(cnt, 8) / Param.NcadMax; % probability threshold dependent on Ncad
            Dtgfb(curvet(i, 1), curvet(i, 2), curvet(i, 3)) = Param.Dcell*(1-CellState.p(cnt)); % defining diffusion coefficient for each cell
-
+           
+           CellState.Dcell(cnt)  = Dtgfb(curvet(i, 1), curvet(i, 2), curvet(i, 3)); 
+           CellState.Ctgfb(cnt)  = TGFB; % TGFB concentration gradient
+           
            CellState.Pop(1)      = CellState.Pop(1) + 1; % counts total cells in the system
            cnt                   = cnt + 1;       % increase cell count  
         end
@@ -179,6 +188,8 @@ else
            
            CellState.p(cnt) = CellState.conc(cnt, 8) / Param.NcadMax; 
            Dtgfb(pos(1), pos(2), pos(3)) = Param.Dcell*(1 - CellState.p(cnt));
+           CellState.Dcell(cnt)  = Dtgfb(pos(1), pos(2), pos(3)); 
+           CellState.Ctgfb(cnt)  = TGFB; % TGFB concentration gradient           
            
            CellState.Pop(4) =  CellState.Pop(4) + 1; % counts total cells in the system
            cnt = cnt + 1; % increase cell count 
@@ -201,12 +212,8 @@ CellState.Position = [CellState.Position, CellState.Position];
 
 CellState.Ncad = [CellState.conc(:, 8), CellState.conc(:, 8)];
 CellState.Ecad         = CellState.conc(:, 7);
-
 CellState.Snail        = CellState.conc(:, 2);
 CellState.Zeb1         = CellState.conc(:, 5); 
-
-CellState.R200        = CellState.conc(:, 6);
-CellState.R34         = CellState.conc(:, 3);   
 
 CellState.AvgEcad(1)       = mean(CellState.conc(:, 7)); 
 CellState.AvgNcad(1)       = mean(CellState.conc(:, 8));
@@ -217,11 +224,20 @@ CellState.AvgZeb1(1)       = mean(CellState.conc(:, 5));
 CellState.AvgR200(1)       = mean(CellState.conc(:, 6)); 
 CellState.AvgR34(1)        = mean(CellState.conc(:, 3));
 
-Imgdim = sum(Cstate); Imgdim = squeeze(Imgdim); Imgdim = imfill(Imgdim);
-Imedge = edge(Imgdim); 
+CellState.AvgDtgfb(1)      = mean(CellState.Dcell);
+CellState.AvgTGFB(1)       = mean(CellState.Ctgfb);
 
-CellState.Carea(1) = length(find(Imgdim > 0));
-CellState.Cperim(1) = length(find(Imedge > 0));
-    
+Imgdim = sum(Cstate); Imgdim = squeeze(Imgdim); Imgdim = imfill(Imgdim);
+Imgdim2 = permute(Imgdim, [1 3 2]);
+Imgdim2 = reshape(Imgdim,[],size(Imgdim,2),1);
+Imgdim2 = imbinarize(Imgdim2);
+tempStat = regionprops(Imgdim2, 'Area', 'MajorAxisLength','MinorAxisLength');
+tempStat = struct2table(tempStat);
+[~, maxInd] = max(tempStat.Area);
+
+CellState.Carea(1) = tempStat.Area(maxInd);
+CellState.MajorD(1) = tempStat.MajorAxisLength(maxInd);
+CellState.MinorD(1) = tempStat.MinorAxisLength(maxInd);
+
 end
 
