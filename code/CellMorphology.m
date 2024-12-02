@@ -56,7 +56,7 @@ switch MorphType
                        CellState.p(cnt)      = CellState.conc(cnt, 8) / Param.NcadMax; % probability threshold dependent on Ncad
                        Dtgfb(i,j,k)          = Param.Dcell*(1-CellState.p(cnt)); % defining diffusion coefficient for each cell
                        CellState.Dcell(cnt)  = Dtgfb(i,j,k); 
-                       CellState.Ctgfb(cnt)  = TGFB; % TGFB concentration gradient
+                       CellState.Ctgfb(cnt)  = Ctgfb(i,j,k); % TGFB concentration gradient
                        
                        CellState.Pop(1) =  CellState.Pop(1) + 1; % counts total cells in the system
                        cnt       = cnt + 1;       % increase cell count    
@@ -85,7 +85,7 @@ switch MorphType
                        CellState.p(cnt)      = CellState.conc(cnt, 8) / Param.NcadMax; % probability threshold dependent on Ncad
                        Dtgfb(i,j,k)          = Param.Dcell*(1-CellState.p(cnt)); % defining diffusion coefficient for each cell
                        CellState.Dcell(cnt)  = Dtgfb(i,j,k); 
-                       CellState.Ctgfb(cnt)  = TGFB; % TGFB concentration gradient
+                       CellState.Ctgfb(cnt)  = Ctgfb(i,j,k); % TGFB concentration gradient
                        
                        CellState.Pop(1) =  CellState.Pop(1) + 1; % counts total cells in the system
                        cnt       = cnt + 1;       % increase cell count   
@@ -158,7 +158,7 @@ switch MorphType
            Dtgfb(curvet(i, 1), curvet(i, 2), curvet(i, 3)) = Param.Dcell*(1-CellState.p(cnt)); % defining diffusion coefficient for each cell
            
            CellState.Dcell(cnt)  = Dtgfb(curvet(i, 1), curvet(i, 2), curvet(i, 3)); 
-           CellState.Ctgfb(cnt)  = TGFB; % TGFB concentration gradient
+           CellState.Ctgfb(cnt)  = Ctgfb(curvet(i, 1), curvet(i, 2), curvet(i, 3)); % TGFB concentration gradient
            
            CellState.Pop(1)      = CellState.Pop(1) + 1; % counts total cells in the system
            cnt                   = cnt + 1;       % increase cell count  
@@ -189,7 +189,7 @@ else
            CellState.p(cnt) = CellState.conc(cnt, 8) / Param.NcadMax; 
            Dtgfb(pos(1), pos(2), pos(3)) = Param.Dcell*(1 - CellState.p(cnt));
            CellState.Dcell(cnt)  = Dtgfb(pos(1), pos(2), pos(3)); 
-           CellState.Ctgfb(cnt)  = TGFB; % TGFB concentration gradient           
+           CellState.Ctgfb(cnt)  = Ctgfb(pos(1), pos(2), pos(3)); % TGFB concentration gradient           
            
            CellState.Pop(4) =  CellState.Pop(4) + 1; % counts total cells in the system
            cnt = cnt + 1; % increase cell count 
