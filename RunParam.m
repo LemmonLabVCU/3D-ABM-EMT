@@ -1,18 +1,16 @@
 function [Param] = RunParam( )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+% RunParam.m Initialize constant parameter values being used in the model. 
 
 % Variables for meshgrid and spheroid
 Param.n           = 32;               % grid size (units)
 
 % Initializing Cell Characteristics
 Param.Csize       = 15;               % size of the cell (um)
-Param.Crado       = 4.5;                % outer radius fo the spheroid (units)
+Param.Crado       = 4.5;              % outer radius fo the spheroid (units)
 Param.Cradi       = 4.0;              % inner radius fo the spheroid (units)
 
 % Setting up Diffusion Coefficients/ ECM representation
-Param.Dcell   = 38;                % TGFB Diffusion coefficient for epithelial cells (1/hr)
-
+Param.Dcell   = 38;                % TGFB Diffusion coefficient for epithelial cells (pixel2/hr)
 
 % Variables defining cell activity
 Param.NcadMax          = 3.1515;
