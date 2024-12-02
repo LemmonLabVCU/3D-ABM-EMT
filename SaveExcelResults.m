@@ -1,10 +1,9 @@
-function DataOutput = SaveExcelResults(CellState, Param, Cstate, Ctgfb, Dtgfb, incr, ~)
+function DataOutput = SaveExcelResults(CellState, Param, Cstate, Ctgfb, Dtgfb, incr, DataOutput)
 % SaveExcelResults.m: Saves outputs to an excel file
 
 n           = Param.n;               % grid size (units)
 L           = n*Param.Csize;          % length of the mesh (um)
 h           = round(n/2);       % center of the spheroid (pixels)
-DataOutput  = [];
 
 % Total Run Outputs
 
@@ -70,8 +69,11 @@ for i = 2:5
         DataOutput.EcadAvg(incr, i) = mean(CellState.conc(ind, 7));
         DataOutput.NcadAvg(incr, i) = mean(CellState.Ncad(ind, 2));
 
-        DataOutput.SnailAvg(incr, i) = mean(CellState.conc(ind, 2));
-        DataOutput.AvgZeb(incr, i)    = mean(CellState.conc(ind, 5));
+        DataOutput.snailTAvg(incr, i) = mean(CellState.conc(ind, 1));
+        DataOutput.SnailAvg(incr, i)  = mean(CellState.conc(ind, 2));
+        
+        DataOutput.AvgzebT(incr, i)   = mean(CellState.conc(ind, 4));
+        DataOutput.AvgZeb1(incr, i)    = mean(CellState.conc(ind, 5));
 
         DataOutput.AvgR200(incr, i)   = mean(CellState.conc(ind, 6)); 
         DataOutput.AvgR34(incr, i)    = mean(CellState.conc(ind,3));
@@ -86,8 +88,11 @@ for i = 2:5
         DataOutput.EcadAvg(incr, i)       = 0;
         DataOutput.NcadAvg(incr, i)       = 0;
 
+        DataOutput.snailTAvg(incr, i)     = 0;
         DataOutput.SnailAvg(incr, i)      = 0;
-        DataOutput.AvgZeb(incr, i)        = 0;
+        
+        DataOutput.AvgzebT(incr, i)       = 0;
+        DataOutput.AvgZeb1(incr, i)       = 0;
 
         DataOutput.AvgR200(incr, i)       = 0; 
         DataOutput.AvgR34(incr, i)        = 0;
