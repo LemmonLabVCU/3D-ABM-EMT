@@ -1,4 +1,5 @@
-function DataOutput = SaveExcelResults(CellState, Param, Cstate, Ctgfb, C0tgfb, TGFB, Dtgfb, Tfinal, incr)
+function DataOutput = SaveExcelResults(CellState, Param, Cstate, Ctgfb, Dtgfb, incr, ~)
+% SaveExcelResults.m: Saves outputs to an excel file
 
 n           = Param.n;               % grid size (units)
 L           = n*Param.Csize;          % length of the mesh (um)
@@ -6,7 +7,6 @@ h           = round(n/2);       % center of the spheroid (pixels)
 DataOutput  = [];
 
 % Total Run Outputs
-Change_TGFB = Ctgfb - C0tgfb; % Change in TGFB concentration
 
 % Changes in cell movement
 for i = 1:length(CellState.Position)
@@ -32,79 +32,73 @@ for v = 1:length(FPos)
     end
 end
 
-DataOutput.TGFB(incr,1) = TGFB;
-DataOutput.Dtgfb(incr,1) = Param.Dcell;
-DataOutput.Tfinal(incr, 1) = Tfinal;
-
-
 eInd = find(CellState.state < 4); % find values for epithelial cells
 
 DataOutput.TotState(incr, :)  = [sum(CellState.Pop(end, 1:3)), CellState.Pop(end, 1:4)];
 DataOutput.CellLoc(incr, 1:3) = CellLoc;
   
-DataOutput.EcadAvg(incr, 1)  = mean(CellState.Ecad(eInd));
-DataOutput.NcadAvg(incr, 1)  = mean(CellState.Ncad(eInd,2));
+DataOutput.EcadAvg(incr, 1)   = mean(CellState.conc(eInd, 7));
+DataOutput.NcadAvg(incr, 1)   = mean(CellState.Ncad(eInd, 2));
 
-DataOutput.SnailAvg(incr, 1) = mean(CellState.Snail(eInd));    
-DataOutput.Zeb1Avg(incr, 1)  = mean(CellState.Zeb1(eInd));
+DataOutput.snailTAvg(incr, 1) = mean(CellState.conc(eInd, 1));
+DataOutput.SnailAvg(incr, 1)  = mean(CellState.conc(eInd, 2));
 
-DataOutput.AvgmiR34(incr, 1) = mean(CellState.conc(eInd, 3));
-DataOutput.AvgmiR200(incr, 1) = mean(CellState.conc(eInd, 6));
+DataOutput.AvgzebT(incr, 1)   = mean(CellState.conc(eInd, 4));
+DataOutput.AvgZeb(incr, 1)    = mean(CellState.conc(eInd, 5));
+    
+DataOutput.AvgR200(incr, 1)   = mean(CellState.conc(eInd, 6)); 
+DataOutput.AvgR34(incr, 1)    = mean(CellState.conc(eInd, 3));
 
-DataOutput.CellTgfbAvg(incr, 1) = mean(mean(mean(Ctgfb)));
-DataOutput.TgfbAvgChange(incr, 1) = mean(mean(mean(Change_TGFB))); 
-
-DataOutput.CellDtgfbAvg(incr, 1) = mean(mean(mean(Dtgfb)));     
+DataOutput.CellTGFBAvg(incr, 1)   = mean(CellState.Ctgfb(eInd));
+DataOutput.CellDtgfb(incr, 1)     = mean(CellState.Dcell(eInd));
 
 DataOutput.DistanceMoved(incr, 1) = mean(CellState.movement(eInd));
 DataOutput.AvgTimesMoved(incr, 1) = mean(CellState.TimesMoved(eInd));
 
-DataOutput.SpheroidArea(incr, 1) = CellState.Carea(end);
-DataOutput.SpheroidPerim(incr, 1) = CellState.Cperim(end);
+DataOutput.CArea(incr, 1) = CellState.Carea(end);
+DataOutput.MajDia(incr, 1) = CellState.MajorD(end);
+DataOutput.MinDia(incr, 1) = CellState.MinorD(end);
+
+DataOutput.TotTGFB(incr, 1) = mean(Ctgfb, 'all');
+DataOutput.TotDtgfb(incr, 1) = mean(Dtgfb, 'all');
 
 for i = 2:5
     ind = find(CellState.state == (i-1));
     ind2 = find(Cstate == i - 1);         
     
     if ind > 0 % defining outputs of individual cell states
-        DataOutput.EcadAvg(incr, i) = mean(CellState.Ecad(ind));
+        DataOutput.EcadAvg(incr, i) = mean(CellState.conc(ind, 7));
         DataOutput.NcadAvg(incr, i) = mean(CellState.Ncad(ind, 2));
 
-        DataOutput.SnailAvg(incr, i)      = mean(CellState.Snail(ind)); 
-        DataOutput.Zeb1Avg(incr, i)       = mean(CellState.Zeb1(ind));
-        
-        DataOutput.AvgmiR34(incr, i)      = mean(CellState.conc(ind, 3));
-        DataOutput.AvgmiR200(incr, i)     = mean(CellState.conc(ind, 6));
+        DataOutput.SnailAvg(incr, i) = mean(CellState.conc(ind, 2));
+        DataOutput.AvgZeb(incr, i)    = mean(CellState.conc(ind, 5));
 
-        DataOutput.CellTgfbAvg(incr, i)   = mean(Ctgfb(ind2));
-        DataOutput.TgfbAvgChange(incr, i) = mean(Change_TGFB(ind2)); 
-             
-        DataOutput.CellDtgfbAvg(incr, i)  = mean(Dtgfb(ind2));
+        DataOutput.AvgR200(incr, i)   = mean(CellState.conc(ind, 6)); 
+        DataOutput.AvgR34(incr, i)    = mean(CellState.conc(ind,3));
         
+        DataOutput.CellTGFBAvg(incr, 1)   = mean(CellState.Ctgfb(ind));
+        DataOutput.CellDtgfb(incr, 1)     = mean(CellState.Dcell(ind));
+                
         DataOutput.DistanceMoved(incr, i) = mean(CellState.movement(ind));
         DataOutput.AvgTimesMoved(incr, i) = mean(CellState.TimesMoved(ind));
 
     else % if there are no cells in specified state
         DataOutput.EcadAvg(incr, i)       = 0;
         DataOutput.NcadAvg(incr, i)       = 0;
-        
-        DataOutput.SnailAvg(incr, i)      = 0;
-        DataOutput.Zeb1Avg(incr, i)       = 0;
-        
-        DataOutput.AvgmiR34(incr, i)      = 0;
-        DataOutput.AvgmiR200(incr, i)     = 0;
 
-        DataOutput.CellTgfbAvg(incr, i)   = 0;
-        DataOutput.TgfbAvgChange(incr, i) = 0;
-             
-        DataOutput.CellDtgfbAvg(incr, i)  = 0;
-        
+        DataOutput.SnailAvg(incr, i)      = 0;
+        DataOutput.AvgZeb(incr, i)        = 0;
+
+        DataOutput.AvgR200(incr, i)       = 0; 
+        DataOutput.AvgR34(incr, i)        = 0;
+
+        DataOutput.CellTGFBAvg(incr, 1)   = 0;
+        DataOutput.CellDtgfb(incr, 1)     = 0;
+
         DataOutput.DistanceMoved(incr, i) = 0;
         DataOutput.AvgTimesMoved(incr, i) = 0; 
-        
-        DataOutput.TgfbAvgChange(incr, i) = 0;
+
     end             
-end
+end  % Finish formatting data
 
 end
-
