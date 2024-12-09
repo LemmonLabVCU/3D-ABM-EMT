@@ -57,7 +57,7 @@ hold off; ax1.FontSize = 16;
 ax2 = nexttile; 
 Cellpnts = find(Cstate(:,:,:) == 1); % Epithelial Cells
 [C2, C1, C3] = ind2sub([n n n], Cellpnts); 
-kind = find(C2 >= h-2 & C2 <= h+2);
+kind = find(C1 >= h-2 & C1 <= h+2);
 k = scatter3(z(C1(kind)), y(C2(kind)), x(C3(kind)), 'MarkerFaceColor',[0 1 0]); view(-90, 0)
 k.SizeData = 100;
 hold on;
@@ -69,13 +69,13 @@ k.SizeData = 100;
 hold on;
 Cellpnts = find(Cstate(:,:,:) == 3); % Mesenchymal Cells
 [C2, C1, C3] = ind2sub([n n n], Cellpnts);
-kind = find(C2 >= h-2 & C2 <= h+2);
+kind = find(C1 >= h-2 & C1 <= h+2);
 k = scatter3(x(C1(kind)), y(C2(kind)), z(C3(kind)), 'MarkerFaceColor',[1 0 0]);
 k.SizeData = 100;
 hold on;               
 Cellpnts = find(Cstate(:,:,:) == 4); % Fibroblasts
 [C2, C1, C3] = ind2sub([n n n], Cellpnts);
-kind = find(C2 >= h-2 & C2 <= h+2);
+kind = find(C1 >= h-2 & C1 <= h+2);
 k = scatter3(x(C1(kind)), y(C2(kind)), z(C3(kind)), 'MarkerFaceColor',[0.4940 0.1840 0.5560]);
 k.SizeData = 50;  
 
@@ -118,7 +118,7 @@ ax6 = nexttile;
 plot(1:t, CellState.AvgEcad, 'g-', 'LineWidth',2); hold on; 
 plot(1:t, CellState.AvgNcad, 'r-','LineWidth',2);
 plot(1:t, CellState.AvgSnail, 'm-', 'LineWidth',2);
-plot(1:t, CellState.AvgZeb, 'b-','LineWidth',2); 
+plot(1:t, CellState.AvgZeb1, 'b-','LineWidth',2); 
 plot(1:t, CellState.AvgR34, 'k-','LineWidth',2); 
 plot(1:t, CellState.AvgR200, 'k--','LineWidth',2);
 subtitle('EMT Markers', 'FontSize', 18);
