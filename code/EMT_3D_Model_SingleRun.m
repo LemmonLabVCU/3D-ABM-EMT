@@ -80,7 +80,7 @@ plotFigs_SingleRun(CellState, Param, Cstate, Ctgfb, Dtgfb, Tfinal, 1, TGFBMax, D
 if getVideo == 1 % To record a .gif of the run
     F1(1) = getframe(gcf); drawnow;
     im = frame2im(F1(1));
-    [imind{1}, cm{1}] = rgb2ind(im, 256); % use color
+    [imind, cm] = rgb2ind(im, 256); % use color
     imwrite(imind, cm, videoName, 'gif', 'Loopcount', inf); % save image to the loop
 end
 
