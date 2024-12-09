@@ -101,7 +101,7 @@ ax3.FontSize = 16;
 ax4 = nexttile;
 slice(X, Y, Z, Ctgfb, xslice, yslice, zslice);  % view(90,0); 
 subtitle('TGFB Gradient', 'FontSize', 18);
-colormap (ax4, jet); colorbar; clim([0 TGFBMax]);
+colormap (ax4, jet); colorbar; caxis([0 TGFBMax]);
 xlim([0 L]); ylim([0 L]); zlim([0 L]);
 ax4.FontSize = 16;
 
@@ -109,7 +109,7 @@ ax4.FontSize = 16;
 ax5 = nexttile;
 slice(X, Y, Z, Dtgfb, xslice, yslice, zslice);  % view(90,0); 
 subtitle('Local Dtgfb Values', 'FontSize', 18);
-colormap(ax5, jet); colorbar; clim([0 DMax]);
+colormap(ax5, jet); colorbar; caxis([0 DMax]);
 xlim([0 L]); ylim([0 L]); zlim([0 L]);
 ax5.FontSize = 16;
 
