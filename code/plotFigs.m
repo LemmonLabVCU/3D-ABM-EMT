@@ -96,11 +96,11 @@ hold (UIAxes4, 'off');
 % Display TGFB gradient
 slice(UIAxes5, X, Y, Z, Ctgfb, xslice, yslice, zslice);
 % view(UIAxes5, 90, 0);
-colormap(UIAxes5, jet); colorbar(UIAxes5); clim(UIAxes5, [0 TGFBMax]);
+colormap(UIAxes5, jet); colorbar(UIAxes5); caxis(UIAxes5, [0 TGFBMax]);
 
 % Display TGFB Diffusion Coefficient Values (Dtgfb)
 slice(UIAxes6, X, Y, Z, Dtgfb, xslice, yslice, zslice); 
 %view(UIAxes6, 90, 0);
-colormap(UIAxes6, jet); colorbar(UIAxes6); clim(UIAxes6, [0 38]);
+colormap(UIAxes6, jet); colorbar(UIAxes6); caxis(UIAxes6, [0 38]);
 
 end
