@@ -23,26 +23,28 @@ y           = linspace(0, L, n); % converts pixels to um
 z           = linspace(0, L, n); % converts pixels to um
 [X, Y, Z]   = meshgrid(x, y, z); % Setting up the 3D grid
 
+CellCnt     = length(CellState.state);
+
 % _______________________________________________________________________
     
 % Display cell movement + EMT
 Cellpnts = find(Cstate(:,:,:) == 1);
-[C1, C2, C3] = ind2sub([n n n], Cellpnts);
+[C2, C1, C3] = ind2sub([n n n], Cellpnts);
 k = scatter3(UIAxes, x(C1), y(C2), z(C3), 'MarkerFaceColor',[0 1 0]);
 k.SizeData = 100; hold(UIAxes, 'on');
 
 Cellpnts = find(Cstate(:,:,:) == 2);
-[C1, C2, C3] = ind2sub([n n n], Cellpnts);
+[C2, C1, C3] = ind2sub([n n n], Cellpnts);
 k = scatter3(UIAxes, x(C1), y(C2), z(C3), 'MarkerFaceColor',[1 1 0]);
 k.SizeData = 100; hold(UIAxes, 'on');
 
 Cellpnts = find(Cstate(:,:,:) == 3);
-[C1, C2, C3] = ind2sub([n n n], Cellpnts);
+[C2, C1, C3] = ind2sub([n n n], Cellpnts);
 k = scatter3(UIAxes, x(C1), y(C2), z(C3), 'MarkerFaceColor',[1 0 0]);
 k.SizeData = 100; hold(UIAxes, 'on');
 
 Cellpnts = find(Cstate(:,:,:) == 4);
-[C1, C2, C3] = ind2sub([n n n], Cellpnts);
+[C2, C1, C3] = ind2sub([n n n], Cellpnts);
 k = scatter3(UIAxes, x(C1), y(C2), z(C3), ...
     'MarkerFaceColor',[0.4940 0.1840 0.5560]);
 k.SizeData = 50; 
@@ -59,7 +61,7 @@ plot(UIAxes2,  1:t, CellState.Pop(1:t, 2), '*-', ...
 plot(UIAxes2,  1:t, CellState.Pop(1:t, 3), 'r*-'); % Mesenchymal
 legend(UIAxes2, 'Epithelial', 'Partial', 'Mesenchymal', ...
     'Location', 'southoutside');
-xlim(UIAxes2, [0 Tfinal]); ylim(UIAxes2, [0 200]);
+xlim(UIAxes2, [0 Tfinal]); ylim(UIAxes2, [0 CellCnt]);
 hold (UIAxes2, 'off'); 
 
 % Display changes in Average EMT concentrations over time
